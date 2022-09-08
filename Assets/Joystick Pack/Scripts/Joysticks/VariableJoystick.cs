@@ -5,13 +5,26 @@ using UnityEngine.EventSystems;
 
 public class VariableJoystick : Joystick
 {
+    public static VariableJoystick Instance;
+    public bool  isTouched;
     public float MoveThreshold { get { return moveThreshold; } set { moveThreshold = Mathf.Abs(value); } }
 
     [SerializeField] private float moveThreshold = 1;
     [SerializeField] private JoystickType joystickType = JoystickType.Fixed;
 
+
     private Vector2 fixedPosition = Vector2.zero;
 
+    private void Awake()
+    {
+        if (Instance!=null)
+        {
+            Destroy(this);
+            return;
+
+        }
+        Instance = this;
+    }
     public void SetMode(JoystickType joystickType)
     {
         this.joystickType = joystickType;
@@ -26,6 +39,7 @@ public class VariableJoystick : Joystick
 
     protected override void Start()
     {
+        isTouched = false;
         base.Start();
         fixedPosition = background.anchoredPosition;
         SetMode(joystickType);
@@ -39,6 +53,9 @@ public class VariableJoystick : Joystick
             background.gameObject.SetActive(true);
         }
         base.OnPointerDown(eventData);
+        isTouched = true;
+
+
     }
 
     public override void OnPointerUp(PointerEventData eventData)
@@ -47,6 +64,7 @@ public class VariableJoystick : Joystick
             background.gameObject.SetActive(false);
 
         base.OnPointerUp(eventData);
+        isTouched = false;
     }
 
     protected override void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
